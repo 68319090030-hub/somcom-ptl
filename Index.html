@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Service Portal - แจ้งซ่อมอุปกรณ์</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00d2ff;
+            --secondary-color: #3a7bd5;
+            --accent-color: #764ba2;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --text-dark: #2d3436;
+        }
+
+        * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
+
+        body { 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            background: radial-gradient(circle at top left, #1e3c72, #2a5298, #000000);
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+        /* ตกแต่งพื้นหลังด้วยวงกลมเรืองแสง */
+        body::before {
+            content: ""; position: fixed; top: -10%; left: -10%; width: 400px; height: 400px;
+            background: var(--primary-color); filter: blur(150px); opacity: 0.2; z-index: -1;
+        }
+
+        .repair-container { 
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem; 
+            border-radius: 24px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3); 
+            width: 90%; 
+            max-width: 480px; 
+            border: 1px solid rgba(255,255,255,0.3);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .icon-header {
+            text-align: center;
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px var(--primary-color));
+        }
+
+        h2 { 
+            text-align: center; 
+            color: var(--text-dark); 
+            margin: 0; 
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        p.subtitle { 
+            text-align: center; 
+            color: #636e72; 
+            font-size: 0.9rem; 
+            margin-bottom: 2rem; 
+        }
+
+        .form-group { margin-bottom: 1.2rem; }
+
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            color: #2d3436; 
+            font-weight: 600; 
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        input, select, textarea { 
+            width: 100%; 
+            padding: 12px 16px; 
+            border: 2px solid #dfe6e9; 
+            border-radius: 12px; 
+            outline: none;
+            background: white;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus, textarea:focus { 
+            border-color: var(--secondary-color); 
+            box-shadow: 0 0 15px rgba(58, 123, 213, 0.2);
+            transform: scale(1.01);
+        }
+
+        button.btn-submit { 
+            width: 100%; 
+            padding: 16px; 
+            background: linear-gradient(45deg, #3a7bd5, #00d2ff);
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-size: 1.1rem; 
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button.btn-submit:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 210, 255, 0.4);
+            filter: brightness(1.1);
+        }
+
+        /* Admin Secret Zone */
+        .admin-secret-zone { 
+            position: fixed; bottom: 15px; right: 15px; 
+            width: 40px; height: 40px; 
+            display: flex; justify-content: center; align-items: center; 
+            z-index: 999; 
+        }
+        .admin-btn { 
+            color: white; font-size: 18px; opacity: 0.1; 
+            transition: all 0.4s; cursor: pointer; 
+        }
+        .admin-secret-zone:hover .admin-btn { opacity: 0.8; transform: rotate(90deg); }
+
+        /* Modal Login */
+        .modal { 
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; 
+            width: 100%; height: 100%; background: rgba(0,0,0,0.8); 
+            backdrop-filter: blur(8px); 
+        }
+        .modal-content { 
+            background: white; margin: 10% auto; padding: 40px; 
+            border-radius: 24px; width: 90%; max-width: 380px; 
+            text-align: center; border: 1px solid rgba(255,255,255,0.2);
+        }
+        .modal-content h3 { font-family: 'Orbitron', sans-serif; color: #2d3436; }
+        
+        .btn-cancel { background: #f1f2f6; color: #636e72; margin-top: 10px; border: none; padding: 10px; border-radius: 8px; cursor: pointer; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="repair-container">
+    <div class="icon-header">🚀</div>
+    <h2>IT SERVICE</h2>
+    <p class="subtitle">แจ้งซ่อมอุปกรณ์ผ่านระบบออนไลน์</p>
+
+    <form id="userRepairForm">
+        <div class="form-group">
+            <label>ชื่อผู้แจ้ง</label>
+            <input type="text" id="userName" name="username" placeholder="ระบุชื่อ-นามสกุล" required>
+        </div>
+
+        <div class="form-group">
+            <label>เบอร์โทรศัพท์ติดต่อ</label>
+            <input type="tel" id="userPhone" name="phone" placeholder="0xx-xxx-xxxx" required>
+        </div>
+
+        <div class="form-group">
+            <label>ประเภทอุปกรณ์</label>
+            <select id="userDevice" name="device_type">
+                <option value="PC (ตั้งโต๊ะ)">🖥️ PC (ตั้งโต๊ะ)</option>
+                <option value="Laptop (โน้ตบุ๊ก)">💻 Laptop (โน้ตบุ๊ก)</option>
+                <option value="มือถือ">📱 มือถือ / แท็บเล็ต</option>
+                <option value="อุปกรณ์ต่อพ่วง">⌨️ อุปกรณ์ต่อพ่วง</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>รายละเอียดอาการเสีย</label>
+            <textarea id="userIssue" name="issue_details" placeholder="เช่น เปิดไม่ติด, จอฟ้า, อินเทอร์เน็ตหลุดบ่อย..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">ยืนยันการส่งข้อมูล</button>
+    </form>
+</div>
+
+<div class="admin-secret-zone">
+    <div class="admin-btn" onclick="openLogin()">⚙️</div>
+</div>
+
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <h3>🔐 ADMIN ACCESS</h3>
+        <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">กรุณากรอกรหัสผ่านเพื่อเข้าสู่ระบบหลังบ้าน</p>
+        <input type="password" id="adminPass" placeholder="••••••••" style="text-align: center; font-size: 1.5rem; letter-spacing: 5px;">
+        <button class="btn-submit" onclick="checkAuth()">LOGIN</button>
+        <button class="btn-cancel" onclick="closeLogin()">ยกเลิก</button>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('userRepairForm');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        let db = JSON.parse(localStorage.getItem('repair_db')) || [];
+        const now = new Date();
+        const currentDate = now.toLocaleDateString('th-TH'); // ปรับวันที่ให้เป็นฟอร์แมตไทย
+
+        const newJob = {
+            Num: db.length > 0 ? db[db.length - 1].Num + 1 : 1,
+            day: currentDate,
+            name: document.getElementById('userName').value,
+            phone: document.getElementById('userPhone').value,
+            EQM: document.getElementById('userDevice').value,
+            sym: document.getElementById('userIssue').value,
+            status: 'pending',
+            manage: 'จัดการ'
+        };
+
+        db.push(newJob);
+        localStorage.setItem('repair_db', JSON.stringify(db));
+
+        // เอฟเฟกต์แจ้งเตือนแบบสวยงาม
+        alert('✅ บันทึกข้อมูลเรียบร้อย! เจ้าหน้าที่จะติดต่อกลับโดยเร็วที่สุด');
+        form.reset();
+    });
+
+    function openLogin() {
+        document.getElementById("loginModal").style.display = "block";
+        document.getElementById("adminPass").focus();
+    }
+
+    function closeLogin() {
+        document.getElementById("loginModal").style.display = "none";
+        document.getElementById("adminPass").value = "";
+    }
+
+    function checkAuth() {
+        const pass = document.getElementById("adminPass").value;
+        if (pass === "25102005") {
+            window.location.href = "Admin.html"; 
+        } else {
+            alert("รหัสผ่านไม่ถูกต้อง! กรุณาลองใหม่อีกครั้ง");
+            document.getElementById("adminPass").value = "";
+        }
+    }
+
+    window.onclick = function(event) {
+        if (event.target == document.getElementById("loginModal")) {
+            closeLogin();
+        }
+    }
+</script>
+
+</body>
+</html>
