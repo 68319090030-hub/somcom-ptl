@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แจ้งซ่อมอุปกรณ์คอมพิวเตอร์</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
+        body { 
+            margin: 0; display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        }
+        .repair-container { 
+            background: white; padding: 2.5rem; border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 100%; max-width: 450px; 
+            position: relative;
+        }
+        h2 { text-align: center; color: #333; margin-bottom: 0.5rem; }
+        p.subtitle { text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 2rem; }
+        label { display: block; margin-bottom: 5px; color: #555; font-weight: 600; font-size: 0.9rem; }
+        input, select, textarea { 
+            width: 100%; padding: 12px 15px; margin-bottom: 1.2rem; 
+            border: 1px solid #e1e1e1; border-radius: 8px; outline: none;
+            background-color: #f9f9f9;
+        }
+        input:focus, textarea:focus { border-color: #764ba2; background-color: #fff; }
+        textarea { resize: vertical; min-height: 80px; }
+        button { 
+            width: 100%; padding: 14px; background: #764ba2; color: white; 
+            border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600;
+        }
+        button:hover { background: #5a3782; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+
+        .admin-secret-zone { 
+            position: fixed; bottom: 0; right: 0; width: 50px; height: 50px; 
+            display: flex; justify-content: center; align-items: center; z-index: 999;
+        }
+        .admin-btn { 
+            text-decoration: none; font-size: 16px; opacity: 0; transition: opacity 0.3s ease; 
+            cursor: pointer; background: rgba(255, 255, 255, 0.2); width: 30px; height: 30px; 
+            display: flex; justify-content: center; align-items: center; border-radius: 50%; 
+        }
+        .admin-secret-zone:hover .admin-btn { opacity: 1; }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
+        .modal-content { background: white; margin: 15% auto; padding: 30px; border-radius: 16px; width: 90%; max-width: 350px; text-align: center; }
+        .btn-cancel { background: #ccc; color: #333; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="repair-container">
+    <div style="text-align: center; font-size: 3rem; margin-bottom: 10px;">🛠️</div>
+    <h2>แจ้งซ่อมอุปกรณ์</h2>
+    <p class="subtitle">กรุณากรอกข้อมูลเพื่อแจ้งอาการเสีย</p>
+
+    <form id="userRepairForm">
+        <label>ชื่อผู้แจ้ง</label>
+        <input type="text" id="userName" placeholder="ระบุชื่อของคุณ" required>
+
+        <label>เบอร์โทรศัพท์</label>
+        <input type="tel" id="userPhone" placeholder="0xx-xxx-xxxx" required>
+
+        <label>ประเภทอุปกรณ์</label>
+        <select id="userDevice">
+            <option value="PC (ตั้งโต๊ะ)">PC (ตั้งโต๊ะ)</option>
+            <option value="Laptop (โน้ตบุ๊ก)">Laptop (โน้ตบุ๊ก)</option>
+            <option value="มือถือ">มือถือ</option>
+            <option value="อุปกรณ์ต่อพ่วง">อุปกรณ์ต่อพ่วง</option>
+        </select>
+
+        <label>อาการเสีย</label>
+        <textarea id="userIssue" placeholder="อธิบายอาการเสีย..." required></textarea>
+
+        <button type="submit" id="submitBtn">ส่งข้อมูลแจ้งซ่อม</button>
+    </form>
+</div>
+
+<div class="admin-secret-zone">
+    <div class="admin-btn" onclick="openLogin()">⚙️</div>
+</div>
+
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <h3>🔐 แอดมินล็อกอิน</h3>
+        <input type="password" id="adminPass" placeholder="รหัสผ่าน" style="text-align: center; font-size: 1.2rem;">
+        <button onclick="checkAuth()">เข้าสู่ระบบ</button>
+        <button class="btn-cancel" onclick="closeLogin()">ยกเลิก</button>
+    </div>
+</div>
+
+<script>
+    // URL ที่นายให้มา
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ6iZIhxFxBXxJVxIUYx7OQkDvLfvuRWNJMhLs20xkZMjqt0eJjJuCLcaldL1TQIo9/exec'; 
+
+    const form = document.getElementById('userRepairForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        submitBtn.innerText = 'กำลังส่งข้อมูล...';
+        submitBtn.disabled = true;
+
+        const data = {
+            name: document.getElementById('userName').value,
+            phone: document.getElementById('userPhone').value,
+            EQM: document.getElementById('userDevice').value,
+            sym: document.getElementById('userIssue').value
+        };
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(data)
+        })
+        .then(() => {
+            alert('ส่งข้อมูลแจ้งซ่อมเรียบร้อยแล้ว!');
+            form.reset();
+        })
+        .catch(error => alert('เกิดข้อผิดพลาด!'))
+        .finally(() => {
+            submitBtn.innerText = 'ส่งข้อมูลแจ้งซ่อม';
+            submitBtn.disabled = false;
+        });
+    });
+
+    function openLogin() { document.getElementById("loginModal").style.display = "block"; document.getElementById("adminPass").focus(); }
+    function closeLogin() { document.getElementById("loginModal").style.display = "none"; document.getElementById("adminPass").value = ""; }
+    function checkAuth() {
+        if (document.getElementById("adminPass").value === "25102005") {
+            window.location.href = "Admin.html"; 
+        } else {
+            alert("รหัสผ่านไม่ถูกต้อง!");
+        }
+    }
+</script>
+
+</body>
+</html>
