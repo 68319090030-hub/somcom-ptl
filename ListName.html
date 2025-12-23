@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการรายการซ่อมคอมพิวเตอร์</title>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f4f7f6;
+            padding: 20px;
+            color: #333;
+        }
+        .table-container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #2ecc71; /* เปลี่ยนเป็นสีเขียวให้เหมาะกับระบบจัดการ */
+            color: white;
+        }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+        
+        /* สำหรับกรณีไม่มีข้อมูล */
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="table-container">
+        <h2>📋 รายการแจ้งซ่อม (Database Connection Ready)</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 8%;">ลำดับ</th>
+                    <th style="width: 20%;">ชื่อผู้แจ้ง</th>
+                    <th style="width: 15%;">เบอร์โทรศัพท์</th>
+                    <th style="width: 15%;">ประเภท</th>
+                    <th>คำอธิบายอาการเสียหาย</th>
+                </tr>
+            </thead>
+            <tbody id="repair-data">
+                <tr>
+                    <td colspan="5" class="no-data">กำลังรอการเชื่อมต่อข้อมูล...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
