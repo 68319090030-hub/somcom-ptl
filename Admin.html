@@ -27,8 +27,20 @@
             border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600;
         }
         button:disabled { background: #ccc; }
-        .admin-trigger { position: fixed; bottom: 10px; right: 10px; opacity: 0.1; cursor: pointer; }
-        .admin-trigger:hover { opacity: 1; }
+
+        /* ปรับปุ่มเฟืองให้เห็นชัดขึ้นและกดง่าย */
+        .admin-trigger { 
+            position: fixed; bottom: 20px; right: 20px; 
+            background: rgba(255, 255, 255, 0.9); 
+            width: 50px; height: 50px; 
+            display: flex; justify-content: center; align-items: center; 
+            border-radius: 50%; cursor: pointer; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+        .admin-trigger:hover { transform: rotate(90deg) scale(1.1); }
+
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
         .modal-content { background: white; margin: 15% auto; padding: 30px; border-radius: 16px; width: 320px; text-align: center; }
     </style>
@@ -58,11 +70,12 @@
     </form>
 </div>
 
-<div class="admin-trigger" onclick="openLogin()">⚙️</div>
+<div class="admin-trigger" onclick="openLogin()" title="สำหรับแอดมิน">⚙️</div>
 
 <div id="loginModal" class="modal">
     <div class="modal-content">
         <h3>🔐 แอดมินล็อกอิน</h3>
+        <p style="font-size: 0.8rem; color: #666;">กรุณาใส่รหัสผ่านเพื่อเข้าหน้า Dashboard</p>
         <input type="password" id="adminPass" placeholder="รหัสผ่าน" style="text-align: center; margin-bottom: 10px;">
         <button onclick="checkAuth()">เข้าสู่ระบบ</button>
         <button onclick="closeLogin()" style="background: #eee; color: #333; margin-top: 5px;">ยกเลิก</button>
@@ -70,8 +83,8 @@
 </div>
 
 <script>
-    // ✅ อัปเดต URL ใหม่ให้แล้วครับ Bro
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxkcDowYEoP1OB9hMYoHnfJRGvJGzFx-0dcCFn4hh8hPI66H9PLFiawrv-CB3CgplN5/exec';
+    // ✅ URL Web App ของนายที่ตั้งค่าเป็น Anyone เรียบร้อยแล้ว
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbkcDowYEoP1OB9hMYoHnfJRGvJGzFx-0dcCFn4hh8hPI66H9PLFiawrv-CB3CgplN5/exec';
 
     document.getElementById('userRepairForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -91,7 +104,7 @@
             alert('ส่งข้อมูลแจ้งซ่อมเรียบร้อยแล้ว!');
             this.reset();
         })
-        .catch(() => alert('เกิดข้อผิดพลาด!'))
+        .catch(() => alert('เกิดข้อผิดพลาดในการส่งข้อมูล!'))
         .finally(() => {
             btn.innerText = 'ส่งข้อมูลแจ้งซ่อม';
             btn.disabled = false;
@@ -100,12 +113,22 @@
 
     function openLogin() { document.getElementById("loginModal").style.display = "block"; }
     function closeLogin() { document.getElementById("loginModal").style.display = "none"; }
+    
     function checkAuth() {
-        if (document.getElementById("adminPass").value === "25102005") {
+        const pass = document.getElementById("adminPass").value;
+        // รหัสผ่านเดิมของนาย
+        if (pass === "25102005") {
+            // มั่นใจว่าไฟล์ชื่อ Admin.html (A ตัวใหญ่)
             window.location.href = "Admin.html"; 
         } else {
             alert("รหัสผ่านไม่ถูกต้อง!");
         }
+    }
+
+    // ปิด Modal เมื่อคลิกข้างนอก
+    window.onclick = function(event) {
+        let modal = document.getElementById("loginModal");
+        if (event.target == modal) closeLogin();
     }
 </script>
 </body>
