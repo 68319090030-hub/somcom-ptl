@@ -28,29 +28,14 @@
         }
         button:disabled { background: #ccc; }
 
-        /* --- ส่วนที่แก้ไข: ปุ่มแอดมินล่องหน --- */
-        .admin-trigger { 
-            position: fixed; 
-            bottom: 10px; 
-            right: 10px; 
-            width: 60px; 
-            height: 60px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            cursor: pointer;
-            font-size: 1.5rem;
-            opacity: 0; /* ทำให้มองไม่เห็นในตอนแรก */
-            transition: opacity 0.4s ease, transform 0.4s ease; /* เพิ่มความสมูทตอนปรากฏ */
-            z-index: 999;
+        /* ปุ่มแอดมินล่องหน (เอาเมาส์ชี้ถึงจะเห็น) */
+        .Admin-trigger { 
+            position: fixed; bottom: 10px; right: 10px; width: 60px; height: 60px; 
+            display: flex; justify-content: center; align-items: center; 
+            cursor: pointer; font-size: 1.5rem; opacity: 0; 
+            transition: opacity 0.4s ease, transform 0.4s ease; z-index: 999;
         }
-
-        /* เมื่อเอาเมาส์ไปชี้ที่บริเวณมุมขวาล่าง ปุ่มจะโผล่มา */
-        .admin-trigger:hover { 
-            opacity: 1; /* ปรากฏตัวขึ้นมา */
-            transform: rotate(90deg); /* หมุนเฟืองเท่ๆ */
-        }
-        /* ---------------------------------- */
+        .Admin-trigger:hover { opacity: 1; transform: rotate(90deg); }
 
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
         .modal-content { background: white; margin: 15% auto; padding: 30px; border-radius: 16px; width: 320px; text-align: center; }
@@ -62,7 +47,6 @@
     <div style="text-align: center; font-size: 3rem;">🛠️</div>
     <h2>แจ้งซ่อมอุปกรณ์</h2>
     <p class="subtitle">กรอกข้อมูลเพื่อแจ้งอาการเสีย</p>
-
     <form id="userRepairForm">
         <label>ชื่อผู้แจ้ง</label>
         <input type="text" id="userName" placeholder="ระบุชื่อของคุณ" required>
@@ -81,12 +65,12 @@
     </form>
 </div>
 
-<div class="admin-trigger" onclick="openLogin()">⚙️</div>
+<div class="Admin-trigger" onclick="openLogin()">⚙️</div>
 
 <div id="loginModal" class="modal">
     <div class="modal-content">
         <h3>🔐 แอดมินล็อกอิน</h3>
-        <input type="password" id="adminPass" placeholder="รหัสผ่าน" style="text-align: center; margin-bottom: 10px;">
+        <input type="password" id="AdminPass" placeholder="รหัสผ่าน" style="text-align: center; margin-bottom: 10px;">
         <button onclick="checkAuth()">เข้าสู่ระบบ</button>
         <button onclick="closeLogin()" style="background: #eee; color: #333; margin-top: 5px;">ยกเลิก</button>
     </div>
@@ -124,9 +108,10 @@
     function closeLogin() { document.getElementById("loginModal").style.display = "none"; }
     
     function checkAuth() {
-        const pass = document.getElementById("adminPass").value;
+        const pass = document.getElementById("AdminPass").value;
         if (pass === "25102005") {
-            window.location.href = "admin.html"; 
+            // ✅ แก้เป็น Admin.html (ตัว A ใหญ่) ให้ตรงกับชื่อไฟล์จริง
+            window.location.href = "Admin.html"; 
         } else {
             alert("รหัสผ่านไม่ถูกต้อง!");
         }
