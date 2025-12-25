@@ -28,7 +28,6 @@
         }
         button:disabled { background: #ccc; }
 
-        /* ปุ่มแอดมินล่องหน (เอาเมาส์ชี้ถึงจะเห็น) */
         .Admin-trigger { 
             position: fixed; bottom: 10px; right: 10px; width: 60px; height: 60px; 
             display: flex; justify-content: center; align-items: center; 
@@ -77,7 +76,8 @@
 </div>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbkcDowYEoP1OB9hMYoHnfJRGvJGzFx-0dcCFn4hh8hPI66H9PLFiawrv-CB3CgplN5/exec';
+    // URL ที่รวม Deployment ID ของคุณเรียบร้อยแล้ว
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtWCAUUMVbU5o0D2VqemVnOOjkGacWbLg4a17GMfrqBZMoGtwufA2_kbwSgnflXz5d/exec';
 
     document.getElementById('userRepairForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -110,7 +110,6 @@
     function checkAuth() {
         const pass = document.getElementById("AdminPass").value;
         if (pass === "25102005") {
-            // ลิงก์ไปยังหน้า Admin Dashboard
             window.location.href = "Admin.html"; 
         } else {
             alert("รหัสผ่านไม่ถูกต้อง!");
