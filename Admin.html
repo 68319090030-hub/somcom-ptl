@@ -15,7 +15,7 @@
         .sidebar-menu { list-style: none; padding: 20px 0; flex-grow: 1; }
         .sidebar-menu li { padding: 15px 25px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
         .sidebar-menu li:hover, .sidebar-menu li.active { background: #764ba2; }
-        .btn-logout { background: #e74c3c; color: white; border: none; padding: 15px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.3s; }
+        .btn-logout { background: #e74c3c; color: white; border: none; padding: 15px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.3s; text-align: center; text-decoration: none; display: block; }
         .btn-logout:hover { background: #c0392b; }
 
         /* Main Content */
@@ -46,6 +46,58 @@
         .status-pending { background: #fff3cd; color: #856404; }
         .status-success { background: #d4edda; color: #155724; }
 
+        /* Modal Styles (ป๊อปอัพยืนยัน) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .btn-confirm {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-cancel {
+            background-color: #bdc3c7;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
         @media (max-width: 768px) {
             .card-stats { grid-template-columns: 1fr; }
             .sidebar { display: none; }
@@ -54,13 +106,24 @@
 </head>
 <body>
 
+<div id="logoutModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-top: 0; color: #2c3e50;">ยืนยันการออกจากระบบ?</h3>
+        <p style="color: #666;">คุณต้องการออกจากระบบจัดการงานซ่อมใช่หรือไม่</p>
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="closeLogoutModal()">ยกเลิก</button>
+            <button class="btn-confirm" onclick="confirmLogout()">ออกจากระบบ</button>
+        </div>
+    </div>
+</div>
+
 <div class="sidebar">
     <div class="sidebar-header">🛠 Admin Control</div>
     <ul class="sidebar-menu">
         <li class="active" onclick="location.reload()">🏠 หน้าแรก Dashboard</li>
         <li onclick="window.open('https://docs.google.com/spreadsheets/d/1aJaiT2Z979-vBSKKlTj_y1IIdB-3ncKtIBV3kudgTaM/edit', '_blank')">📄 เปิด Google Sheets</li>
     </ul>
-    <button class="btn-logout" onclick="window.location.href='index.html'">🚪 ออกจากระบบ</button>
+    <button class="btn-logout" onclick="openLogoutModal()">🚪 ออกจากระบบ</button>
 </div>
 
 <div class="main-content">
@@ -110,8 +173,28 @@
 </div>
 
 <script>
-    // ✅ สำคัญ: แก้ไข URL นี้เป็นลิงก์ Web App (ที่ลงท้ายด้วย /exec) ของนายเท่านั้น
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbkcDowYEoP1OB9hMYoHnfJRGvJGzFx-0dcCFn4hh8hPI66H9PLFiawrv-CB3CgplN5/exec';
+
+    // ฟังก์ชันจัดการ Modal
+    function openLogoutModal() {
+        document.getElementById('logoutModal').style.display = 'flex';
+    }
+
+    function closeLogoutModal() {
+        document.getElementById('logoutModal').style.display = 'none';
+    }
+
+    function confirmLogout() {
+        window.location.href = 'index.html';
+    }
+
+    // ปิด Modal เมื่อคลิกพื้นหลังสีดำ
+    window.onclick = function(event) {
+        const modal = document.getElementById('logoutModal');
+        if (event.target == modal) {
+            closeLogoutModal();
+        }
+    }
 
     async function fetchData() {
         const tbody = document.getElementById('tableBody');
