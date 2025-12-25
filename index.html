@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แจ้งซ่อมอุปกรณ์คอมพิวเตอร์</title>
+    <title>ระบบแจ้งซ่อมอุปกรณ์ - 68319090030</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
@@ -13,10 +13,9 @@
         }
         .repair-container { 
             background: white; padding: 2rem; border-radius: 16px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 90%; max-width: 450px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 95%; max-width: 450px; 
         }
-        h2 { text-align: center; color: #333; margin: 0 0 10px; }
-        .subtitle { text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 25px; }
+        h2 { text-align: center; color: #333; margin-top: 0; }
         label { display: block; margin-bottom: 5px; color: #555; font-weight: 600; font-size: 0.9rem; }
         input, select, textarea { 
             width: 100%; padding: 12px; margin-bottom: 1.2rem; 
@@ -25,17 +24,20 @@
         button { 
             width: 100%; padding: 14px; background: #764ba2; color: white; 
             border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600;
+            transition: 0.3s;
         }
-        button:disabled { background: #ccc; }
+        button:hover { background: #5a368a; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
 
-        .Admin-trigger { 
-            position: fixed; bottom: 10px; right: 10px; width: 60px; height: 60px; 
+        /* ปุ่มแอดมินล่องหน (มุมขวาล่าง) */
+        .admin-trigger { 
+            position: fixed; bottom: 15px; right: 15px; width: 50px; height: 50px; 
             display: flex; justify-content: center; align-items: center; 
-            cursor: pointer; font-size: 1.5rem; opacity: 0; 
-            transition: opacity 0.4s ease, transform 0.4s ease; z-index: 999;
+            cursor: pointer; font-size: 1.5rem; opacity: 0; transition: 0.4s; z-index: 999;
         }
-        .Admin-trigger:hover { opacity: 1; transform: rotate(90deg); }
+        .admin-trigger:hover { opacity: 1; transform: rotate(90deg); }
 
+        /* Modal ล็อกอิน */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
         .modal-content { background: white; margin: 15% auto; padding: 30px; border-radius: 16px; width: 320px; text-align: center; }
     </style>
@@ -43,14 +45,17 @@
 <body>
 
 <div class="repair-container">
-    <div style="text-align: center; font-size: 3rem;">🛠️</div>
+    <div style="text-align: center; font-size: 3.5rem; margin-bottom: 10px;">🛠️</div>
     <h2>แจ้งซ่อมอุปกรณ์</h2>
-    <p class="subtitle">กรอกข้อมูลเพื่อแจ้งอาการเสีย</p>
+    <p style="text-align: center; color: #888; font-size: 0.8rem; margin-bottom: 20px;">ID: 68319090030-somcom-ptl</p>
+    
     <form id="userRepairForm">
         <label>ชื่อผู้แจ้ง</label>
         <input type="text" id="userName" placeholder="ระบุชื่อของคุณ" required>
+        
         <label>เบอร์โทรศัพท์</label>
         <input type="tel" id="userPhone" placeholder="0xx-xxx-xxxx" required>
+        
         <label>ประเภทอุปกรณ์</label>
         <select id="userDevice">
             <option value="PC (ตั้งโต๊ะ)">PC (ตั้งโต๊ะ)</option>
@@ -58,31 +63,33 @@
             <option value="มือถือ">มือถือ</option>
             <option value="อุปกรณ์ต่อพ่วง">อุปกรณ์ต่อพ่วง</option>
         </select>
+        
         <label>อาการเสีย</label>
-        <textarea id="userIssue" placeholder="อธิบายอาการเสีย..." required></textarea>
+        <textarea id="userIssue" rows="3" placeholder="อธิบายอาการเสียโดยละเอียด..." required></textarea>
+        
         <button type="submit" id="submitBtn">ส่งข้อมูลแจ้งซ่อม</button>
     </form>
 </div>
 
-<div class="Admin-trigger" onclick="openLogin()">⚙️</div>
+<div class="admin-trigger" onclick="openLogin()">⚙️</div>
 
 <div id="loginModal" class="modal">
     <div class="modal-content">
-        <h3>🔐 แอดมินล็อกอิน</h3>
-        <input type="password" id="AdminPass" placeholder="รหัสผ่าน" style="text-align: center; margin-bottom: 10px;">
+        <h3 style="margin-top: 0;">🔐 แอดมินล็อกอิน</h3>
+        <input type="password" id="adminPass" placeholder="รหัสผ่าน" style="text-align: center; margin-bottom: 15px;">
         <button onclick="checkAuth()">เข้าสู่ระบบ</button>
-        <button onclick="closeLogin()" style="background: #eee; color: #333; margin-top: 5px;">ยกเลิก</button>
+        <button onclick="closeLogin()" style="background: #eee; color: #333; margin-top: 8px;">ยกเลิก</button>
     </div>
 </div>
 
 <script>
-    // URL ที่รวม Deployment ID ของคุณเรียบร้อยแล้ว
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtWCAUUMVbU5o0D2VqemVnOOjkGacWbLg4a17GMfrqBZMoGtwufA2_kbwSgnflXz5d/exec';
+    // ✅ ใช้ URL เว็บแอปที่นายได้มา
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwkJJPFt-s-fhj-KTcuxJhD57FMAxH_67uBQz8d3zXOUcnjF7GSpXTimOC1VB_IOjLV/exec';
 
     document.getElementById('userRepairForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
-        btn.innerText = 'กำลังส่งข้อมูล...';
+        btn.innerText = 'กำลังบันทึกข้อมูล...';
         btn.disabled = true;
 
         const data = {
@@ -92,12 +99,19 @@
             sym: document.getElementById('userIssue').value
         };
 
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
+        fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: JSON.stringify(data) 
+        })
         .then(() => {
-            alert('ส่งข้อมูลแจ้งซ่อมเรียบร้อยแล้ว!');
+            alert('บันทึกข้อมูลแจ้งซ่อมสำเร็จ! เจ้าหน้าที่จะติดต่อกลับครับ');
             this.reset();
         })
-        .catch(() => alert('เกิดข้อผิดพลาด!'))
+        .catch(err => {
+            console.error(err);
+            alert('เกิดข้อผิดพลาดในการส่งข้อมูล');
+        })
         .finally(() => {
             btn.innerText = 'ส่งข้อมูลแจ้งซ่อม';
             btn.disabled = false;
@@ -108,7 +122,7 @@
     function closeLogin() { document.getElementById("loginModal").style.display = "none"; }
     
     function checkAuth() {
-        const pass = document.getElementById("AdminPass").value;
+        const pass = document.getElementById("adminPass").value;
         if (pass === "25102005") {
             window.location.href = "Admin.html"; 
         } else {
