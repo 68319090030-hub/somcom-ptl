@@ -69,7 +69,7 @@
 </div>
 
 <script>
-    // ⚠️ วาง Web App URL จาก Google Apps Script (อันเดียวกับหน้า index.html)
+    // ✅ แก้ไขให้แล้วครับ
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ6iZIhxFxBXxJVxIUYx7OQkDvLfvuRWNJMhLs20xkZMjqt0eJjJuCLcaldL1TQIo9/exec';
 
     async function fetchData() {
@@ -80,18 +80,15 @@
             
             tbody.innerHTML = '';
 
-            // อัปเดตตัวเลข Stats
             document.getElementById('total-count').innerText = data.length;
             document.getElementById('pending-count').innerText = data.filter(i => i.สถานะ !== 'เสร็จสิ้น').length;
             document.getElementById('success-count').innerText = data.filter(i => i.สถานะ === 'เสร็จสิ้น').length;
 
-            // ตรวจสอบว่ามีข้อมูลไหม
             if (data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">ยังไม่มีข้อมูลการแจ้งซ่อม</td></tr>';
                 return;
             }
 
-            // เรียงจากใหม่ไปเก่าและสร้างตาราง
             data.reverse().forEach(item => {
                 const dateObj = new Date(item.วันที่);
                 const formattedDate = isNaN(dateObj) ? item.วันที่ : dateObj.toLocaleDateString('th-TH');
@@ -119,7 +116,6 @@
         document.getElementById('clock').innerText = new Date().toLocaleString('th-TH');
     }
 
-    // เริ่มทำงาน
     setInterval(updateClock, 1000);
     updateClock();
     fetchData();
