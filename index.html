@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบแจ้งซ่อมอุปกรณ์ - 68319090030</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #6366f1; --primary-dark: #4f46e5; }
+        * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
+        body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px; }
+        .container { background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); width: 100%; max-width: 450px; }
+        h2 { text-align: center; color: #1e293b; margin: 0 0 10px 0; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 30px; font-size: 0.9rem; }
+        label { display: block; margin-bottom: 8px; color: #475569; font-weight: 600; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 20px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none; transition: 0.3s; font-size: 1rem; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+        button { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 1.1rem; font-weight: 600; transition: 0.3s; }
+        button:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        button:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .admin-btn { position: fixed; bottom: 20px; right: 20px; width: 40px; height: 40px; cursor: pointer; opacity: 0.1; transition: 0.5s; }
+        .admin-btn:hover { opacity: 1; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); }
+        .modal-content { background: white; width: 320px; margin: 20vh auto; padding: 30px; border-radius: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div style="font-size: 3rem; text-align: center;">🛠️</div>
+    <h2>แจ้งซ่อมอุปกรณ์</h2>
+    <p class="sub">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อดำเนินการ</p>
+    <form id="repairForm">
+        <label>ชื่อผู้แจ้ง</label>
+        <input type="text" id="userName" placeholder="ระบุชื่อของคุณ" required>
+        <label>เบอร์โทรศัพท์</label>
+        <input type="tel" id="userPhone" placeholder="0xx-xxx-xxxx" required>
+        <label>ประเภทอุปกรณ์</label>
+        <select id="userDevice">
+            <option value="PC">🖥️ PC (ตั้งโต๊ะ)</option>
+            <option value="Laptop">💻 Laptop (โน้ตบุ๊ก)</option>
+            <option value="มือถือ">📱 มือถือ</option>
+            <option value="อื่นๆ">📦 อุปกรณ์อื่นๆ</option>
+        </select>
+        <label>อาการเสีย</label>
+        <textarea id="userIssue" rows="3" placeholder="ระบุอาการเบื้องต้น..." required></textarea>
+        <button type="submit" id="submitBtn">ส่งข้อมูลการแจ้งซ่อม</button>
+    </form>
+</div>
+
+<div class="admin-btn" onclick="document.getElementById('m').style.display='block'">⚙️</div>
+<div id="m" class="modal"><div class="modal-content">
+    <h3>Admin Login</h3>
+    <input type="password" id="pw" placeholder="Password" style="text-align:center">
+    <button onclick="check()">Login</button>
+    <p onclick="document.getElementById('m').style.display='none'" style="cursor:pointer; color:#64748b; margin-top:15px">ยกเลิก</p>
+</div></div>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyVgRPIEk-LH6BugpopSlssv0r301J-dHIkAUgsCIZ4BqnLj30x4-eN0NoWJhCH7hYG/exec';
+    
+    document.getElementById('repairForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true; btn.innerText = 'กำลังส่งข้อมูล...';
+        
+        const data = {
+            name: document.getElementById('userName').value,
+            phone: document.getElementById('userPhone').value,
+            EQM: document.getElementById('userDevice').value,
+            sym: document.getElementById('userIssue').value
+        };
+
+        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) })
+        .then(() => { alert('ส่งข้อมูลสำเร็จ!'); this.reset(); })
+        .catch(() => alert('ส่งข้อมูลสำเร็จ'))
+        .finally(() => { btn.disabled = false; btn.innerText = 'ส่งข้อมูลการแจ้งซ่อม'; });
+    });
+
+    function check() {
+        if(document.getElementById('pw').value === '25102005') window.location.href = 'Admin.html';
+        else alert('รหัสผิด!');
+    }
+</script>
+</body>
+</html>
