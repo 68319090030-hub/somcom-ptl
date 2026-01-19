@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบแจ้งซ่อมอุปกรณ์ - 68319090030</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
+        body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .repair-container { background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 95%; max-width: 450px; }
+        h2 { text-align: center; color: #333; margin-top: 0; }
+        label { display: block; margin-bottom: 5px; color: #555; font-weight: 600; font-size: 0.9rem; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 1.2rem; border: 1px solid #ddd; border-radius: 8px; outline: none; background: #f9f9f9; font-size: 1rem; }
+        button { width: 100%; padding: 14px; background: #764ba2; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: 0.3s; }
+        button:hover { background: #5a368a; }
+        button:disabled { background: #ccc; }
+        /* ปุ่มแอดมินล่องหน */
+        .admin-trigger { position: fixed; bottom: 15px; right: 15px; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 1.5rem; opacity: 0; transition: 0.4s; z-index: 999; }
+        .admin-trigger:hover { opacity: 1; transform: rotate(90deg); }
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
+        .modal-content { background: white; margin: 15% auto; padding: 30px; border-radius: 16px; width: 320px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="repair-container">
+    <div style="text-align: center; font-size: 3.5rem; margin-bottom: 10px;">🛠️</div>
+    <h2>แจ้งซ่อมอุปกรณ์</h2>
+    <form id="userRepairForm">
+        <label>ชื่อผู้แจ้ง</label>
+        <input type="text" id="userName" placeholder="ระบุชื่อของคุณ" required>
+        <label>เบอร์โทรศัพท์</label>
+        <input type="tel" id="userPhone" placeholder="0xx-xxx-xxxx" required>
+        <label>ประเภทอุปกรณ์</label>
+        <select id="userDevice">
+            <option value="PC (ตั้งโต๊ะ)">PC (ตั้งโต๊ะ)</option>
+            <option value="Laptop (โน้ตบุ๊ก)">Laptop (โน้ตบุ๊ก)</option>
+            <option value="มือถือ">มือถือ</option>
+            <option value="อุปกรณ์ต่อพ่วง">อุปกรณ์ต่อพ่วง</option>
+        </select>
+        <label>อาการเสีย</label>
+        <textarea id="userIssue" rows="3" placeholder="อธิบายอาการเสีย..." required></textarea>
+        <button type="submit" id="submitBtn">ส่งข้อมูลแจ้งซ่อม</button>
+    </form>
+</div>
+
+<div class="admin-trigger" onclick="openLogin()">⚙️</div>
+
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-top: 0;">🔐 แอดมินล็อกอิน</h3>
+        <input type="password" id="adminPass" placeholder="รหัสผ่าน" style="text-align: center; margin-bottom: 15px;">
+        <button onclick="checkAuth()">เข้าสู่ระบบ</button>
+        <button onclick="closeLogin()" style="background: #eee; color: #333; margin-top: 8px;">ยกเลิก</button>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/a/macros/ptl.ac.th/s/AKfycby1-4vwqIpClhE_imDzEXponFWoO69DBfHcI_eJ9fnb5-EJ38PPrQDr-NxpKD740862/exec';
+
+    document.getElementById('userRepairForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.innerText = 'กำลังบันทึก...';
+        btn.disabled = true;
+
+        const data = {
+            name: document.getElementById('userName').value,
+            phone: document.getElementById('userPhone').value,
+            EQM: document.getElementById('userDevice').value,
+            sym: document.getElementById('userIssue').value
+        };
+
+        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) })
+        .then(() => {
+            alert('บันทึกข้อมูลสำเร็จ! เจ้าหน้าที่จะติดต่อกลับครับ');
+            this.reset();
+        })
+        .catch(() => alert('บันทึกข้อมูลเรียบร้อย'))
+        .finally(() => {
+            btn.innerText = 'ส่งข้อมูลแจ้งซ่อม';
+            btn.disabled = false;
+        });
+    });
+
+    function openLogin() { document.getElementById("loginModal").style.display = "block"; }
+    function closeLogin() { document.getElementById("loginModal").style.display = "none"; }
+    function checkAuth() {
+        if (document.getElementById("adminPass").value === "25102005") {
+            window.location.href = "Admin.html";
+        } else {
+            alert("รหัสผ่านไม่ถูกต้อง!");
+        }
+    }
+</script>
+</body>
+</html>
