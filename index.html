@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบแจ้งซ่อมอุปกรณ์ - 68319090030</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #6366f1; --primary-dark: #4f46e5; --bg: #f8fafc; }
+        * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
+        body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px; }
+        .container { background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); width: 100%; max-width: 450px; }
+        h2 { text-align: center; color: #1e293b; margin: 0 0 10px 0; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 30px; font-size: 0.9rem; }
+        label { display: block; margin-bottom: 8px; color: #475569; font-weight: 600; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 20px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none; transition: 0.3s; font-size: 1rem; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        button { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 1.1rem; font-weight: 600; transition: 0.3s; }
+        button:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+        
+        /* Admin Hidden Button */
+        .admin-btn { position: fixed; bottom: 20px; right: 20px; width: 40px; height: 40px; cursor: pointer; opacity: 0.1; transition: 0.5s; z-index: 10; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; background: white; border-radius: 50%; }
+        .admin-btn:hover { opacity: 1; transform: rotate(90deg); }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 100; }
+        .modal-content { background: white; width: 320px; margin: 20vh auto; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div style="font-size: 3.5rem; text-align: center; margin-bottom: 10px;">🛠️</div>
+    <h2>แจ้งซ่อมอุปกรณ์</h2>
+    <p class="sub">รหัสผู้พัฒนา: 68319090030</p>
+    
+    <form id="repairForm">
+        <label>ชื่อผู้แจ้ง</label>
+        <input type="text" id="userName" placeholder="ระบุชื่อของคุณ" required>
+        
+        <label>เบอร์โทรศัพท์</label>
+        <input type="tel" id="userPhone" placeholder="0xx-xxx-xxxx" required>
+        
+        <label>ประเภทอุปกรณ์</label>
+        <select id="userDevice">
+            <option value="PC (ตั้งโต๊ะ)">🖥️ PC (ตั้งโต๊ะ)</option>
+            <option value="Laptop (โน้ตบุ๊ก)">💻 Laptop (โน้ตบุ๊ก)</option>
+            <option value="มือถือ">📱 มือถือ</option>
+            <option value="อื่นๆ">📦 อื่นๆ</option>
+        </select>
+        
+        <label>อาการเสีย</label>
+        <textarea id="userIssue" rows="3" placeholder="ระบุอาการเบื้องต้น..." required></textarea>
+        
+        <button type="submit" id="submitBtn">ส่งข้อมูลการแจ้งซ่อม</button>
+    </form>
+</div>
+
+<div class="admin-btn" onclick="openModal()">⚙️</div>
+
+<div id="m" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-top:0"><i class="fa-solid fa-lock"></i> Admin Login</h3>
+        <input type="password" id="pw" placeholder="รหัสผ่าน" style="text-align:center">
+        <button onclick="check()">เข้าสู่ระบบ</button>
+        <p onclick="closeModal()" style="cursor:pointer; color:#64748b; margin-top:15px; font-size: 0.9rem;">ยกเลิก</p>
+    </div>
+</div>
+
+<script>
+    // ใช้ URL Web App ที่คุณสร้างล่าสุด
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjGRktXQ81HLFP818MGCn3VM1H1JTGErYYYwVrN9djABynL2LYPeJJRntWSdv2LVcz/exec';
+    
+    document.getElementById('repairForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        
+        // ป้องกันการกดซ้ำ
+        btn.disabled = true; 
+        btn.innerText = 'กำลังส่งข้อมูล...';
+        
+        // เตรียมข้อมูลให้ตรงกับที่ Apps Script รอรับ
+        const data = {
+            "action": "insert",
+            "name": document.getElementById('userName').value,
+            "phone": document.getElementById('userPhone').value,
+            "device": document.getElementById('userDevice').value,
+            "symptom": document.getElementById('userIssue').value
+        };
+
+        // ส่งข้อมูลแบบ POST (mode: no-cors เพื่อเลี่ยงปัญหา Cross-Origin)
+        fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: JSON.stringify(data) 
+        })
+        .then(() => {
+            alert('🚀 ส่งข้อมูลการแจ้งซ่อมเรียบร้อยแล้ว!');
+            document.getElementById('repairForm').reset();
+        })
+        .catch(err => {
+            console.error(err);
+            alert('❌ เกิดข้อผิดพลาดในการเชื่อมต่อ');
+        })
+        .finally(() => {
+            btn.disabled = false; 
+            btn.innerText = 'ส่งข้อมูลการแจ้งซ่อม';
+        });
+    });
+
+    // --- Admin Logic ---
+    function openModal() { 
+        document.getElementById('m').style.display = 'block'; 
+        document.getElementById('pw').focus(); 
+    }
+    
+    function closeModal() { 
+        document.getElementById('m').style.display = 'none'; 
+        document.getElementById('pw').value = ''; 
+    }
+
+    document.getElementById('pw').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') check();
+    });
+
+    function check() {
+        // รหัสผ่านเดิมของคุณ
+        if(document.getElementById('pw').value === '25102005') {
+            window.location.href = 'Admin.html';
+        } else { 
+            alert('❌ รหัสผ่านไม่ถูกต้อง!'); 
+            document.getElementById('pw').value = ''; 
+        }
+    }
+</script>
+</body>
+</html>
